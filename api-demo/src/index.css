@@ -1,0 +1,70 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: rgb(185, 207, 223);
+}
+
+
+.hero-banner {
+  background-image: url('/public/images/herobanner.webp');
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  text-align: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.api-title {
+  font-size: 4rem;
+  margin: 2rem;
+}
+
+
+
+
+
+.json-example {
+  background-color: rgb(255, 255, 255);
+  color: black;
+  text-align: start;
+  width: 40rem;
+  height: 10rem;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.json-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  top: 15rem;
+}
+
+.dropdown-menu {
+  width: 10rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 0.2rem;
+}
+
+.paragraph {
+  width: 900px;
+  margin: 0 auto;
+  background-color: rgb(0, 0, 0, 0.5);
+  border-radius: 10px;
+}
+
+.footer {
+  margin-top: auto;
+  background-color: rgb(0, 0, 0, 0.5);
+}
