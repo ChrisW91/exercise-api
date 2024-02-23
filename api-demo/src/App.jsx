@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const exerciseApiExample = [
   {
-    "muscle_name": 'Flat Barbell Bench Press',
+    "exercise_name": 'Flat Barbell Bench Press',
     "muscle_group": 'Chest',
     "lift_type": 'Compound',
     "equipment": 'Barbell',
