@@ -10,7 +10,7 @@ body {
 
 
 .hero-banner {
-  background-image: url('/public/images/herobanner.webp');
+  background-image: url('/images/herobanner.webp');
   background-size: cover;
   display: flex;
   flex-direction: column;
