@@ -1,57 +1,78 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
-const exerciseApiExample = [
-  {
-    "exercise_name": 'Flat Barbell Bench Press',
-    "muscle_group": 'Chest',
-    "lift_type": 'Compound',
-    "equipment": 'Barbell',
-    "vid_url": 'https://www.youtube.com/embed/rT7DgCr-3pg?si=bOwJVKD7iSmQFdt6',
-    "tags": 'Front-Delt Tricep'
-  },
-  {
-    "exercise_name": "Seated Cable Row",
-    "muscle_group": "Back",
-    "lift_type": "Compound",
-    "equipment": "Machine",
-    "vid_url": "https://www.youtube.com/embed/UCXxvVItLoM?si=yqqwM_WAZUQ4LkJb",
-    "tags": "Rear-Delt Traps"
-  },
-  {
-    "exercise_name": "Dumbell Shoulder Press",
-    "muscle_group": "Shoulders",
-    "lift_type": "Compound",
-    "equipment": "Dumbell",
-    "vid_url": "https://www.youtube.com/embed/HzIiNhHhhtA?si=ebcs-yli0TThTen3",
-    "tags": "Front-Delt"
-  },
-  {
-    "exercise_name": "Walking Lunges",
-    "muscle_group": "Legs",
-    "lift_type": "Compound",
-    "equipment": "Body",
-    "vid_url": "https://www.youtube.com/embed/_meXEWq5MOQ?si=rlIulGAU5B8M8hHM",
-    "tags": "Quads Hamstring Glutes"
-  },
-  {
-    "exercise_name": "Tricep Dips",
-    "muscle_group": "Arms",
-    "lift_type": "Isolation",
-    "equipment": "Body",
-    "vid_url": "https://www.youtube.com/embed/sM6XUdt1rm4?si=vVFehi1GCahMnwq8",
-    "tags": "Tricep"
-  },
-]
+const apiKey = import.meta.env.VITE_X_API_KEY;
 
 
 
 function App() {
+  const [exercisesCache, setExercisesCache] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedExercise, setSelectedExercise] = useState(null);
 
-  const [selectedExercise, setSelectedExercise] = useState(exerciseApiExample[0]);
 
-  const handleSelectChange = (event) => {
-    setSelectedExercise(exerciseApiExample[event.target.value]);
+
+
+  useEffect(() => {
+    fetchAllExercises();
+  }, []);
+
+  const fetchAllExercises = async () => {
+    return new Promise(async (resolve, reject) => {
+      if (Object.keys(exercisesCache).length === 0) {
+        const apiUrl = `https://b8g31172b2.execute-api.ap-southeast-2.amazonaws.com/exercises`;
+        try {
+          const response = await fetch(apiUrl, {
+            headers: {
+              'x-api-key': apiKey,
+
+            },
+          });
+          const responseData = await response.json();
+          const exercisesData = JSON.parse(responseData.body);
+
+          if (Array.isArray(exercisesData)) {
+            setExercisesCache({ all: exercisesData });
+            resolve(); // Resolve the promise once the state is updated
+          } else {
+            console.error('Fetched data is not an array:', exercisesData);
+            reject('Data is not an array');
+          }
+        } catch (error) {
+          console.error("Failed to fetch exercises:", error);
+          reject(error);
+        }
+      } else {
+        resolve(); // Resolve immediately if the cache already has data
+      }
+    });
+
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      performSearch();
+    }
+  };
+
+  const handleSearchClick = () => {
+    performSearch();
+  };
+
+  const performSearch = () => {
+
+    if (searchTerm && exercisesCache.all) {
+      const filteredExercises = exercisesCache.all.filter(exercise =>
+        exercise.muscle_group && exercise.muscle_group.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      if (filteredExercises.length > 0) {
+        setSelectedExercise(filteredExercises[0]);
+      } else {
+        setSelectedExercise(null);
+      }
+    } else {
+      setSelectedExercise(null);
+    }
   };
 
 
@@ -68,21 +89,24 @@ function App() {
           <p >Welcome to my fitness exercise API demonstration! This webpage showcases a simple yet powerful API designed to enrich your fitness application or website with a vast library of exercise information. Below, you'll find an example of the JSON data returned by our API, featuring detailed attributes such as muscle name, muscle group, lift type, equipment required, a video tutorial link, and relevant tags. Our API is built on a robust AWS infrastructure, utilizing RDS with PostgreSQL for database management, Lambda for serverless compute functions, and API Gateway for seamless access. This efficient and scalable solution is perfect for developers looking to integrate comprehensive exercise data into their projects, providing users with valuable insights to enhance their fitness journey. Explore the example below to see how our API can serve as a cornerstone for your fitness-related content, driving both engagement and value.</p>
         </div>
         <div className="json-container">
+          <div className="search-area">
+            <input
+              type="text"
+              className="search-box"
+              placeholder="Search muscle group..."
+              onKeyDown={handleKeyDown}
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+            <button className="search-btn" onClick={handleSearchClick}>Search</button>
+          </div>
 
-          <select className="dropdown-menu" onChange={handleSelectChange}>
-            <option value="0">Chest</option>
-            <option value="1">Back</option>
-            <option value="2">Shoulders</option>
-            <option value="3">Legs</option>
-            <option value="4">Arms</option>
-
-          </select>
 
           <div className="json-example">
-            <pre>{JSON.stringify(selectedExercise, null, 2)}</pre>
+            <pre>{selectedExercise ? JSON.stringify(selectedExercise, null, 2) : 'No exercise selected or found.'}</pre>
           </div>
         </div>
-        <p className="footer">This webpage serves as a demonstration for portfolio purposes only. The actual API is currently private to prevent unauthorized use.</p>
+
       </div>
 
 
